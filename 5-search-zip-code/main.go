@@ -23,6 +23,8 @@ type ViaCEP struct {
 
 func main() {
 	for _, zipCode := range os.Args[1:] {
+
+		// Buscando na api do viacep o endereço dinamicamente pelo CEP
 		req, err := http.Get("http://viacep.com.br/ws/" + zipCode + "/json/")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Erro ao fazer a requisição: %v\n", err)
@@ -30,6 +32,7 @@ func main() {
 
 		defer req.Body.Close()
 
+		// Armazenando a resposta da chamada a API do viacep
 		res, err := io.ReadAll(req.Body)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Erro ao ler a resposta: %v\n", err)
@@ -42,12 +45,14 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Erro ao fazer o parse da resposta: %v\n", err)
 		}
 
+		// Criando TXT para armazenar os dados
 		file, err := os.Create("city.txt")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Erro ao criar arquivo: %v\n", err)
 		}
 		defer file.Close()
 
+		// Armazenando os dados no arquivo TXT criado
 		_, err = file.WriteString(fmt.Sprintf("CEP: %s, Localidade: %s, Bairro: %s, UF: %s", data.Cep, data.Localidade, data.Bairro, data.Uf))
 		fmt.Printf("CEP: %s armazenado com sucesso!\n", data.Cep)
 	}

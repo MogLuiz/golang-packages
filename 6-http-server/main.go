@@ -30,15 +30,21 @@ func SearchZipCodeHandler(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	cepParam := request.URL.Query().Get("cep")
-	if cepParam == "" {
+	zipCodeParam := request.URL.Query().Get("cep")
+	if zipCodeParam == "" {
 		response.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	zipCode, error := searchZipCode(zipCodeParam)
+	if error != nil {
+		response.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
-	response.Write([]byte("Hello world!"))
+	json.NewEncoder(response).Encode(zipCode)
 }
 
 func searchZipCode(zipCode string) (*ZipCode, error) {

@@ -1,6 +1,23 @@
 package main
 
-import "net/http"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
+type ZipCode struct {
+	Cep         string `json:"cep"`
+	Logradouro  string `json:"logradouro"`
+	Complemento string `json:"complemento"`
+	Bairro      string `json:"bairro"`
+	Localidade  string `json:"localidade"`
+	Uf          string `json:"uf"`
+	Ibge        string `json:"ibge"`
+	Gia         string `json:"gia"`
+	Ddd         string `json:"ddd"`
+	Siafi       string `json:"siafi"`
+}
 
 func main() {
 	http.HandleFunc("/", SearchZipCodeHandler)
@@ -22,4 +39,25 @@ func SearchZipCodeHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
 	response.Write([]byte("Hello world!"))
+}
+
+func searchZipCode(zipCode string) (*ZipCode, error) {
+	response, error := http.Get("http://viacep.com.br/ws/" + zipCode + "/json/")
+	if error != nil {
+		return nil, error
+	}
+
+	defer response.Body.Close()
+
+	body, error := ioutil.ReadAll(response.Body)
+	if error != nil {
+		return nil, error
+	}
+
+	var data ZipCode
+	if error = json.Unmarshal(body, &data); error != nil {
+		return nil, error
+	}
+
+	return &data, nil
 }

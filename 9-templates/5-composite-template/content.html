@@ -10,12 +10,10 @@
         </thead>
         <tbody>
             {{ range . }}
-                {{ if eq .Hours 40 }}
                     <tr>
-                        <td>{{ .Name }}</td>
+                        <td>{{ .Name | ToUpper }}</td>
                         <td>{{ .Hours }}</td>
                     </tr>
-                {{ end }}
             {{ end }}
         </tbody>
     </table>

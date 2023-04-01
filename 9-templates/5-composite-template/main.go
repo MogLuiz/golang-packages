@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 	"text/template"
 )
 
@@ -12,6 +13,10 @@ type Course struct {
 
 type Courses []Course
 
+func ToUpper(s string) string {
+	return strings.ToUpper(s)
+}
+
 func main() {
 
 	templates := []string{
@@ -21,7 +26,10 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(response http.ResponseWriter, request *http.Request) {
-		tmp := template.Must(template.New("content.html").ParseFiles(templates...))
+		tmp := template.New("content.html")
+		tmp.Funcs(template.FuncMap{"ToUpper": ToUpper})
+		tmp = template.Must(tmp.ParseFiles(templates...))
+
 		err := tmp.Execute(response, Courses{
 			{"Go", 40},
 			{"Java", 10},
